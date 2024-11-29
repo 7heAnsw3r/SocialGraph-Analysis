@@ -55,34 +55,34 @@ class Grafo:
             return []  # Siempre retorna una lista vacía si no existe el nodo
 
         visitados = set()  # Conjunto de nodos visitados
-        camino = []  # Lista para almacenar el camino
-        self._dfs_recursivo(self.nodos[start], end, visitados, camino)
 
         # Si se proporcionó un nodo de fin y no se encontró, muestra un mensaje
-        if end and end not in camino:
-            return []
+        camino_actual = []  # Lista para almacenar el camino actual
+        camino_largo = []  # Lista para almacenar el camino más largo encontrado
+        self._dfs_recursivo(self.nodos[start], end, visitados, camino_actual, camino_largo)
 
-        return camino
+        return camino_largo
 
-    def _dfs_recursivo(self, nodo, end, visitados, camino):
+    def _dfs_recursivo(self, nodo, end, visitados, camino_actual, camino_largo):
         """Metodo recursivo auxiliar para DFS."""
         if nodo.nombre in visitados:
             return
         visitados.add(nodo.nombre)  # Marca el nodo como visitado
-        camino.append(nodo.nombre)  # Agrega el nodo al camino
+        camino_actual.append(nodo.nombre)
 
         # Si se llega al nodo de fin, termina el recorrido
-        if nodo.nombre == end:
-            return
+        if end and nodo.nombre == end:
+            if len(camino_actual) > len(camino_largo):
+                camino_largo.clear()
+                camino_largo.extend(camino_actual)
 
         # Recursivamente visita los vecinos no visitados
         for vecino in nodo.vecino:
             if vecino.nombre not in visitados:
-                self._dfs_recursivo(vecino, end, visitados, camino)
-
-        # Si el nodo de fin no fue encontrado, se elimina del camino
-        if end and camino and camino[-1] != end:
-            camino.pop()
+                self._dfs_recursivo(vecino, end, visitados, camino_actual, camino_largo)
+                
+        camino_actual.pop()
+        visitados.remove(nodo.nombre)
 
     def cargar_desde_csv(self, archivo_csv):
         """Carga el grafo desde un archivo CSV."""
